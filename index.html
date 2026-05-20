@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .weather-container {
+            width: 350px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            padding: 10px 15px;
+            border: none;
+            background: #4facfe;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .search-box button:hover {
+            background: #2196f3;
+        }
+
+        .weather-info {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .city {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .temp {
+            font-size: 50px;
+            color: #ff5722;
+            margin: 15px 0;
+        }
+
+        .details {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .date-time {
+            margin-top: 15px;
+            font-size: 15px;
+            color: #777;
+        }
+
+        .error {
+            color: red;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="weather-container">
+        <h1>Weather App</h1>
+
+        <div class="search-box">
+            <input type="text" id="locationInput" placeholder="Enter location">
+            <button onclick="getWeather()">Search</button>
+        </div>
+
+        <div class="weather-info" id="weatherInfo">
+            <div class="city" id="city"></div>
+            <div class="temp" id="temperature"></div>
+
+            <div class="details" id="wind"></div>
+            <div class="details" id="condition"></div>
+
+            <div class="date-time" id="dateTime"></div>
+        </div>
+
+        <div class="error" id="error"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+
+            const location = document.getElementById("locationInput").value;
+
+            const weatherInfo = document.getElementById("weatherInfo");
+            const errorDiv = document.getElementById("error");
+
+            if (location === "") {
+                errorDiv.innerText = "Please enter a location";
+                weatherInfo.style.display = "none";
+                return;
+            }
+
+            errorDiv.innerText = "";
+
+            // Replace q=London with dynamic location
+            const apiUrl = `http://api.weatherapi.com/v1/current.json?key=30d108474f594b38aac23120262005&q=${location}&aqi=yes`;
+
+            try {
+
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error("Location not found");
+                }
+
+                const data = await response.json();
+
+                document.getElementById("city").innerText =
+                    `${data.location.name}, ${data.location.country}`;
+
+                document.getElementById("temperature").innerText =
+                    `${data.current.temp_c}°C`;
+
+                document.getElementById("wind").innerText =
+                    `Wind Speed: ${data.current.wind_kph} kph`;
+
+                document.getElementById("condition").innerText =
+                    `Condition: ${data.current.condition.text}`;
+
+                // Date & Time
+                document.getElementById("dateTime").innerText =
+                    `Local Time: ${data.location.localtime}`;
+
+                weatherInfo.style.display = "block";
+
+            } catch (error) {
+
+                errorDiv.innerText = "Invalid location or API error";
+                weatherInfo.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+
+</html>
